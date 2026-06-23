@@ -21,6 +21,9 @@ public class TelaPrincipal extends JFrame {
     private CadastroLivro   telaCadastroLivro;
     private Emprestimo      telaEmprestimo;
     private Devolução       telaDevolucao;
+    
+    //construtor padrao
+    public TelaPrincipal() {}
 
     public TelaPrincipal(CadastroUsuario telaCadastroUsuario,
                          CadastroLivro   telaCadastroLivro,
