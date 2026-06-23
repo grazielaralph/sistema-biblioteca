@@ -78,5 +78,33 @@ public class BibliotecaController {
         JOptionPane.INFORMATION_MESSAGE
     );
 
+    public void cadastrarUsuario(String nome, int matricula) {
+
+        if (nome == null || nome.trim().isEmpty()) {
+            JoptionPane.showMessageDialog(null,
+                "O nome do usuário é obrigatório!",
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+                return;
+        }
+    }
+
+    for (Usuario usuario : usuarios) {
+        if (u.getMatricula() == matricula) {
+            JOptionPane.showMessageDialog(null,
+                "Matricula" + matricula + "Já cadastrada!",
+                "Ducplicado", JOptionPane.WARNING_MESSAGE);
+                return;
+        }
+    }
+
+    Usuario novoUsuario = new Usuario(nome, matricula);
+    usuarios.add(novoUsuario);
+
+    BibliotecaDAO.salvarUsuarios(usuarios);
+
+    JOptionPane.showMessageDialog(null,
+        "Usuário \"" + nome.trim() + "\" cadastrado com sucesso!", 
+        "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
 
 }
