@@ -1,5 +1,6 @@
 package main;
 
+import controller.BibliotecaController;
 import javax.swing.SwingUtilities;
 import view.CadastroLivro;
 
@@ -10,10 +11,13 @@ public class Main {
             @Override
             public void run() {
                 // 1. Instancia a tela que criamos
-                CadastroLivro telaTestada = new CadastroLivro();
+                CadastroLivro telaCadastroLivro = new CadastroLivro();
                 
-                // 2. Faz a janela ficar visível na tela
-                telaTestada.setVisible(true);
+                // 2. Instancia o controller passando a view
+                new BibliotecaController(telaCadastroLivro);
+
+                //exibe a tela
+                telaCadastroLivro.setVisible(true);
             }
         });
     }
