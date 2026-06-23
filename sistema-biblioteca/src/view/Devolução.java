@@ -107,7 +107,7 @@ public class Devolução extends JFrame {
         contentPane.add(btnSair);
 
         JLabel lblImagem = new JLabel();
-        lblImagem.setIcon(new ImageIcon(Devolução.class.getResource("/imagens/icons8-ei-gatinha-100.png")));
+        lblImagem.setIcon(new ImageIcon(Devolução.class.getResource("/view/imagens/icons8-ei-gatinha-100.png")));
         lblImagem.setBounds(0, 11, 106, 81);
         contentPane.add(lblImagem);
     }

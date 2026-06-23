@@ -107,7 +107,7 @@ public class Emprestimo extends JFrame {
         contentPane.add(btnSair);
 
         JLabel lblImagem = new JLabel();
-        lblImagem.setIcon(new ImageIcon(Emprestimo.class.getResource("/imagens/icons8-ei-gatinha-100.png")));
+        lblImagem.setIcon(new ImageIcon(Emprestimo.class.getResource("/view/imagens/icons8-ei-gatinha-100.png")));
         lblImagem.setBounds(112, 0, 106, 81);
         contentPane.add(lblImagem);
     }

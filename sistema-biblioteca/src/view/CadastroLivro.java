@@ -97,7 +97,7 @@ public class CadastroLivro extends JFrame {
         contentPane.add(lblNewLabel_4);
 
         JLabel lblNewLabel_5 = new JLabel("New label");
-        lblNewLabel_5.setIcon(new ImageIcon(CadastroLivro.class.getResource("/imagens/icons8-ei-gatinha-100.png")));
+        lblNewLabel_5.setIcon(new ImageIcon(CadastroLivro.class.getResource("/view/imagens/icons8-ei-gatinha-100.png")));
         lblNewLabel_5.setBounds(0, 10, 106, 81);
         contentPane.add(lblNewLabel_5);
     }

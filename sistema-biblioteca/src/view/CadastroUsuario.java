@@ -77,7 +77,7 @@ public class CadastroUsuario extends JFrame {
         contentPane.add(btnNewButton);
 
         JLabel lblNewLabel_3 = new JLabel("");
-        lblNewLabel_3.setIcon(new ImageIcon(CadastroUsuario.class.getResource("/imagens/icons8-ei-gatinha-100.png")));
+        lblNewLabel_3.setIcon(new ImageIcon(CadastroUsuario.class.getResource("/view/imagens/icons8-ei-gatinha-100.png")));
         lblNewLabel_3.setBounds(111, 279, 100, 92);
         contentPane.add(lblNewLabel_3);
     }
