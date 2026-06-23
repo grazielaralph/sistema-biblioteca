@@ -19,6 +19,7 @@ public class CadastroUsuario extends JFrame {
     private JTextField textField;
     private JTextField textField_1;
     private JButton btnNewButton;
+    private JButton btnVoltar;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -80,6 +81,13 @@ public class CadastroUsuario extends JFrame {
         lblNewLabel_3.setIcon(new ImageIcon(CadastroUsuario.class.getResource("/view/imagens/icons8-ei-gatinha-100.png")));
         lblNewLabel_3.setBounds(111, 279, 100, 92);
         contentPane.add(lblNewLabel_3);
+        
+        btnVoltar = new JButton("← Voltar");
+        btnVoltar.setBackground(new Color(240, 255, 240));
+        btnVoltar.setForeground(new Color(255, 20, 147));
+        btnVoltar.setFont(new Font("High Tower Text", Font.PLAIN, 13));
+        btnVoltar.setBounds(10, 10, 90, 25); // canto superior esquerdo
+        contentPane.add(btnVoltar);
     }
 
     //método para o controller
@@ -93,5 +101,9 @@ public class CadastroUsuario extends JFrame {
 
     public void acaoBotaoSalvar(ActionListener al) {
         btnNewButton.addActionListener(al);
+    }
+    
+    public void acaoBotaoVoltar(ActionListener al) {
+        btnVoltar.addActionListener(al);
     }
 }

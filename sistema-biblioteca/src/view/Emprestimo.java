@@ -21,6 +21,7 @@ public class Emprestimo extends JFrame {
     private JTextField txtDataDevolucao;
     private JButton btnConfirmar;
     private JButton btnSair;
+    private JButton btnVoltar;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -110,6 +111,14 @@ public class Emprestimo extends JFrame {
         lblImagem.setIcon(new ImageIcon(Emprestimo.class.getResource("/view/imagens/icons8-ei-gatinha-100.png")));
         lblImagem.setBounds(112, 0, 106, 81);
         contentPane.add(lblImagem);
+        
+        // Botao voltar para tela principal
+        btnVoltar = new JButton("← Voltar");
+        btnVoltar.setBackground(new Color(240, 255, 240));
+        btnVoltar.setForeground(new Color(255, 20, 147));
+        btnVoltar.setFont(new Font("High Tower Text", Font.PLAIN, 13));
+        btnVoltar.setBounds(10, 10, 90, 25); // canto superior esquerdo
+        contentPane.add(btnVoltar);
     }
 
     //metódo para o controller
@@ -130,5 +139,9 @@ public class Emprestimo extends JFrame {
 
     public void acaoBotaoConfirmar(ActionListener al) {
         btnConfirmar.addActionListener(al);
+    }
+    
+    public void acaoBotaoVoltar(ActionListener al) {
+        btnVoltar.addActionListener(al);
     }
 }

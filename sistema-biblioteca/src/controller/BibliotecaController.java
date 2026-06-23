@@ -6,6 +6,7 @@ import model.Usuario;
 import view.CadastroLivro;
 import view.CadastroUsuario;
 import view.Emprestimo;
+import view.TelaPrincipal;
 import view.Devolução;
 
 import javax.swing.*;
@@ -28,16 +29,19 @@ public class BibliotecaController {
     private CadastroUsuario  telaCadastroUsuario;
     private Emprestimo       telaEmprestimo;
     private Devolução        telaDevolucao;
+    private TelaPrincipal telaPrincipal;
 
     public BibliotecaController(CadastroLivro    telaCadastroLivro,
                                 CadastroUsuario  telaCadastroUsuario,
                                 Emprestimo       telaEmprestimo,
-                                Devolução        telaDevolucao) {
+                                Devolução        telaDevolucao,
+                                TelaPrincipal telaPrincipal) {
 
         this.telaCadastroLivro   = telaCadastroLivro;
         this.telaCadastroUsuario = telaCadastroUsuario;
         this.telaEmprestimo      = telaEmprestimo;
         this.telaDevolucao       = telaDevolucao;
+        this.telaPrincipal = telaPrincipal;
 
         carregarDados();
         registrarListeners();
@@ -49,6 +53,10 @@ public class BibliotecaController {
         telaCadastroUsuario.acaoBotaoSalvar   (e -> cadastrarUsuario());
         telaEmprestimo     .acaoBotaoConfirmar(e -> realizarEmprestimo());
         telaDevolucao      .acaoBotaoConfirmar(e -> realizarDevolucao());
+        telaCadastroLivro  .acaoBotaoVoltar(e -> voltarParaPrincipal(telaCadastroLivro));
+        telaCadastroUsuario.acaoBotaoVoltar(e -> voltarParaPrincipal(telaCadastroUsuario));
+        telaEmprestimo     .acaoBotaoVoltar(e -> voltarParaPrincipal(telaEmprestimo));
+        telaDevolucao      .acaoBotaoVoltar(e -> voltarParaPrincipal(telaDevolucao));
     }
 
     //cadastro de livro
@@ -72,15 +80,17 @@ public class BibliotecaController {
             }
         }
 
-        Livro novoLivro = new Livro(proximoCodigoLivro++, titulo, autor, true, null, null, null);
+        int idGerado = proximoCodigoLivro++;                              // ← guarda o ID
+        Livro novoLivro = new Livro(idGerado, titulo, autor, true, null, null, null);
         livros.add(novoLivro);
         BibliotecaDAO.salvarLivros(livros);
 
+        telaCadastroLivro.setTxtId(String.valueOf(idGerado));             // ← mostra o ID na tela
+
         JOptionPane.showMessageDialog(telaCadastroLivro,
-            "Livro \"" + titulo + "\" cadastrado com sucesso!",
+            "Livro \"" + titulo + "\" cadastrado com sucesso!\nID: " + idGerado,
             "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
-        telaCadastroLivro.limparCampos();
     }
 
     //cadastro de usuário
@@ -267,6 +277,13 @@ public class BibliotecaController {
             "Devolução Confirmada", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    //voltar para tela principal
+    private void voltarParaPrincipal(JFrame telaAtual) {
+        telaAtual.setVisible(false);   // esconde a tela atual (não destrói)
+        telaPrincipal.setLocationRelativeTo(null);
+        telaPrincipal.setVisible(true);
+    }
+    
     //relatórios
     public String[][] gerarRelatorioLivros() {
         String[][] dados = new String[livros.size()][7];
