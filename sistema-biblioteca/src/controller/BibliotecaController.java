@@ -222,6 +222,59 @@ public class BibliotecaController {
             "Devolução Confirmada", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    //relatorios
+    public String[][] gerarRelatorioLivros() {
+        String[][] dados = new String[livros.size()[4]];
+        for (int i = 0; i < livros.size(); i++) {
+
+            Livro 1 = livros.get(i);
+            dados[i][0] = String.valueof(l.getId());
+            dados[i][1] = l.getTitulo();
+            dados[i][2] = l.getAutor();
+            dados[i][3] = l.isDisponivel() ? "Disponível" : "Emprestado";
+        }
+        return dados;
+    }
+
+    public String[][] gerarRelatorioEmprestimos() {
+        String[][] dados = new String[totalEmprestimos][3];
+        for (int i = 0; i < totalEmprestimos; i ++) {
+            int mat = emprestimos[i][0;
+                int idLivro = emprestimos[i][1];
+
+                String tituloLivro = "";
+                for (Livro 1 : livros) {
+                    tituloLivro = l.getTitulo();
+                    break;
+                }
+
+                dados[i][0] = String.valueOf(mat);
+                dados[i][1] = String.valueOf(idLivro);
+                dados[i][2] = tituloLivro;
+        }
+        return dados;
+    }
+
+    private void carregarDados() {
+        livros = BibliotecaDAO.carregarLivros();
+        usuarios = BibliotecaDAO.carregarUsuario();
+
+        //recalcula o próximo ID com base nos livros que ja tem
+        for (Livro 1 : livros) {
+            if (l.getId() >= proximoIdLivro) {
+                proximoIdLivro = l.getId() + 1;
+            }
+        }
+    }
+
+    //getters -> pra view preencher combos/tabelas
+    public List<Livro> getLivros() {
+        return new ArrayList<>(livros);    
+    }
+
+    public List<Usuario> getUsuarios() {
+        return new ArrayList<>(usuarios);
+    }
 }
 
 
