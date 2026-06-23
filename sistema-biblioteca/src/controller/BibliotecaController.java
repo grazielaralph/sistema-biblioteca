@@ -106,6 +106,73 @@ public class BibliotecaController {
             "Sucesso", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    //emprestimo de livros
+    public void realizarEmprestimo(int matriculaUsuario, int idLivro) {
+
+        Usuario usuarioEncontrado = null;
+        for (Usuario u : usuarios) {
+            if (u.getMatricula() == matriculaUsuario) {
+                usuarioEncontrado = u;
+                break;
+            }
+        }
+
+        Livro livroEncontrado = null;
+        for (Livro l : livros) {
+            if (l.getId() == idLivro) {
+                livroEncontrado = l;
+                break;
+            }
+        }
+
+        if (usuarioEncontrado == null) {
+            JOptionPane.showMessageDialog(null,
+                "Usuario com matricula " + matriculaUsuario + " não encontrado!",
+                "Erro", JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (livroEcontrado == null) {
+            JOptionPane.showMessageDialog(null,
+                "Livro com ID " + idLivro + " não encontrado!",
+                "Erro", JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        if (!livroEncontrado.isDisponivel()) {
+            JOptionPane.showMessageDialog(null,
+                "Este Livro \"" + livroEncontrado.getTitulo() + "\" não está disponível para empréstimo!",
+                "Indisponivel", JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (totalEmprestimos >= emprestimos.length) {
+            JOptionPane.showMessageDialog(null,
+                "Limite de empréstimos atingido!",
+                "Limite", JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        emprestimos[totalEmprestimos][0] = matriculaUsuario;
+        emprestimos[totalEmprestimos][1] = idLivro;
+        totalEmprestimos++;
+        
+        livroEncontrado.setDisponivel(false);
+        BibliotecaDAO.salvarLivros(livros);
+
+        JOptionPane.showMessageDialog(null,
+            "Empréstimo realizado com sucesso!\n" + 
+            "Uusuário : " + usuarioEncontrado.getNome() + "\n" +
+            "Livro :" + livroEcontrado.getTitulo(),
+            "Empréstimo registrado.", JOptionPane.INFORMATION_MESSAGE
+        );
+        
+    }
+
 
 }
 
