@@ -1,15 +1,14 @@
 package view;
 
-import java.awt.EventQueue;
+import java.awt.Color;
+import java.awt.Font;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.Color;
-import javax.swing.JLabel;
-import java.awt.Font;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
 
 public class TelaPrincipal extends JFrame {
 
