@@ -170,8 +170,59 @@ public class BibliotecaController {
             "Livro :" + livroEcontrado.getTitulo(),
             "Empréstimo registrado.", JOptionPane.INFORMATION_MESSAGE
         );
-        
+
     }
+
+    //devolução
+    public void realizarDevolucao(int idLivro) {
+
+        Livro livroEncontado  = null;
+        for (livro 1 : livros) {
+            if (l.getId == idLivro) {
+                livroEncontrado = l;
+                break;
+            }
+        }
+
+        if (livroEncontrado == null) {
+            JOptionPane.showMessageDialog(null,
+                "Livro " + idLivro + " não encontrado!",
+                "Erro", JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        if (!livroEncontrado.isDisponivel()) {
+            JOptionPane.showMessage(null,
+                "Este livro ainda não foi emprestado.",
+                "Aviso", JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        //remove da matriz deslocando os registros - estruturas de repetição + matrizes
+        for (int i = 0; i < totalEmprestimos; i++) {
+            if (emprestimos[i][1] == idLivro) {
+                for (int j = i; j < totalEmprestimos - 1; j++) {
+                    emprestimos[j][0] = emprestimos[j + 1][0];
+                    emprestimos[j][1] = emprestimos[j + 1][1];
+                }
+                emprestimos[totalEmprestimos - 1][0] = 0;
+                emprestimos[totalEmprestimos - 1][1] = 0;
+                totalEmprestimos--;
+                break;
+            }
+        }
+
+        livroEncontrado.setDisponivel(true);
+        BibliotecaDAO.salvarLivros(livros);
+ 
+        JOptionPane.showMessageDialog(null,
+            "Devolução do livro \"" + livroEncontrado.getTitulo() + "\" registrada com sucesso!",
+            "Devolução Confirmada", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+
 
 
 }
