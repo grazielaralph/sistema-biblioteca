@@ -10,117 +10,125 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 
 public class Emprestimo extends JFrame {
 
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JTextField txtCodigoLivro;
+    private JTextField txtMatriculaUsuario;
+    private JTextField txtDataDevolucao;
+    private JButton btnConfirmar;
+    private JButton btnSair;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Emprestimo frame = new Emprestimo();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                Emprestimo frame = new Emprestimo();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
-	/**
-	 * Create the frame.
-	 */
-	public Emprestimo() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 340, 436);
-		contentPane = new JPanel();
-		contentPane.setBackground(new Color(255, 182, 193));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		setLocationRelativeTo(null);
-		contentPane.setLayout(null);
-		
-		// Corrigido de "Livos" para "Livros"
-		JLabel lblNewLabel = new JLabel("Empréstimo de Livros");
-		lblNewLabel.setForeground(new Color(255, 20, 147));
-		lblNewLabel.setFont(new Font("Footlight MT Light", Font.BOLD, 26));
-		lblNewLabel.setBounds(47, 79, 246, 42);
-		contentPane.add(lblNewLabel);
-		
-		textField = new JTextField();
-		textField.setBounds(89, 164, 147, 25);
-		contentPane.add(textField);
-		textField.setColumns(10);
-		
-		JLabel lblNewLabel_1 = new JLabel("Digite o Livro que você deseja emprestar:");
-		lblNewLabel_1.setForeground(new Color(255, 20, 147));
-		lblNewLabel_1.setBackground(new Color(255, 20, 147));
-		lblNewLabel_1.setFont(new Font("High Tower Text", Font.PLAIN, 16));
-		lblNewLabel_1.setBounds(28, 122, 274, 32);
-		contentPane.add(lblNewLabel_1);
-		
-		textField_1 = new JTextField();
-		textField_1.setBounds(89, 275, 147, 25);
-		contentPane.add(textField_1);
-		textField_1.setColumns(10);
-		
-		JLabel lblNewLabel_2 = new JLabel("Data da devolução");
-		lblNewLabel_2.setForeground(new Color(255, 20, 147));
-		lblNewLabel_2.setFont(new Font("Footlight MT Light", Font.PLAIN, 16));
-		lblNewLabel_2.setBounds(98, 238, 129, 25);
-		contentPane.add(lblNewLabel_2);
-		
-		// Botão Sair (instanciado antes para podermos mudar a visibilidade dele no botão Confirmar)
-		JButton btnSair = new JButton("Sair ");
-		btnSair.setVisible(false); 
-		btnSair.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        TelaPrincipal telaPrincipal = new TelaPrincipal();
-		        telaPrincipal.setVisible(true);
-		        dispose(); 
-		    }
-		});
-		btnSair.setBackground(new Color(240, 255, 240)); // Alterado para dar contraste ao texto rosa
-		btnSair.setForeground(new Color(255, 20, 147));
-		btnSair.setFont(new Font("High Tower Text", Font.PLAIN, 13));
-		btnSair.setBounds(125, 323, 75, 25); // Ajustado a largura para o texto caber melhor
-		contentPane.add(btnSair);
+    public Emprestimo() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 340, 470);
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(255, 182, 193));
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        setLocationRelativeTo(null);
+        contentPane.setLayout(null);
 
-		// Botão Confirmar (Único e corrigido)
-		JButton btnConfirmar = new JButton("Confirmar");
-		btnConfirmar.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        java.time.LocalDate hoje = java.time.LocalDate.now();
-		        int diasParaDevolucao = 15;
-		        java.time.LocalDate dataDevolucao = hoje.plusDays(diasParaDevolucao);
-		        
-		        java.time.format.DateTimeFormatter formatador = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		        String dataFormatada = dataDevolucao.format(formatador);
-		        
-		        textField_1.setText(dataFormatada); 
-		        
-		        // Mostra o botão de sair após a confirmação
-		        btnSair.setVisible(true); 
-		    }
-		});
-		btnConfirmar.setBackground(new Color(240, 255, 240));
-		btnConfirmar.setForeground(new Color(255, 20, 147));
-		btnConfirmar.setFont(new Font("High Tower Text", Font.PLAIN, 13));
-		btnConfirmar.setBounds(112, 203, 98, 25);
-		contentPane.add(btnConfirmar);
-		
-		JLabel lblNewLabel_5 = new JLabel("New label");
-		lblNewLabel_5.setIcon(new ImageIcon(Emprestimo.class.getResource("/imagens/icons8-ei-gatinha-100.png")));
-		lblNewLabel_5.setBounds(112, 0, 106, 81);
-		contentPane.add(lblNewLabel_5);
-	}	
+        JLabel lblTitulo = new JLabel("Empréstimo de Livros");
+        lblTitulo.setForeground(new Color(255, 20, 147));
+        lblTitulo.setFont(new Font("Footlight MT Light", Font.BOLD, 26));
+        lblTitulo.setBounds(47, 79, 246, 42);
+        contentPane.add(lblTitulo);
+
+        // --- Código do Livro ---
+        JLabel lblCodigo = new JLabel("Código do Livro:");
+        lblCodigo.setForeground(new Color(255, 20, 147));
+        lblCodigo.setFont(new Font("High Tower Text", Font.PLAIN, 16));
+        lblCodigo.setBounds(28, 135, 160, 25);
+        contentPane.add(lblCodigo);
+
+        txtCodigoLivro = new JTextField();
+        txtCodigoLivro.setBounds(89, 165, 147, 25);
+        contentPane.add(txtCodigoLivro);
+        txtCodigoLivro.setColumns(10);
+
+        // --- Matrícula do Usuário ---
+        JLabel lblMatricula = new JLabel("Matrícula do Usuário:");
+        lblMatricula.setForeground(new Color(255, 20, 147));
+        lblMatricula.setFont(new Font("High Tower Text", Font.PLAIN, 16));
+        lblMatricula.setBounds(28, 200, 190, 25);
+        contentPane.add(lblMatricula);
+
+        txtMatriculaUsuario = new JTextField();
+        txtMatriculaUsuario.setBounds(89, 230, 147, 25);
+        contentPane.add(txtMatriculaUsuario);
+        txtMatriculaUsuario.setColumns(10);
+
+        // --- Data de Devolução (preenchida pelo controller) ---
+        JLabel lblData = new JLabel("Data da devolução:");
+        lblData.setForeground(new Color(255, 20, 147));
+        lblData.setFont(new Font("Footlight MT Light", Font.PLAIN, 16));
+        lblData.setBounds(89, 268, 160, 25);
+        contentPane.add(lblData);
+
+        txtDataDevolucao = new JTextField();
+        txtDataDevolucao.setEditable(false);
+        txtDataDevolucao.setBounds(89, 298, 147, 25);
+        contentPane.add(txtDataDevolucao);
+
+        // --- Botão Confirmar ---
+        btnConfirmar = new JButton("Confirmar");
+        btnConfirmar.setBackground(new Color(240, 255, 240));
+        btnConfirmar.setForeground(new Color(255, 20, 147));
+        btnConfirmar.setFont(new Font("High Tower Text", Font.PLAIN, 13));
+        btnConfirmar.setBounds(112, 338, 98, 25);
+        contentPane.add(btnConfirmar);
+
+        // --- Botão Sair ---
+        btnSair = new JButton("Sair");
+        btnSair.setVisible(false);
+        btnSair.setBackground(new Color(240, 255, 240));
+        btnSair.setForeground(new Color(255, 20, 147));
+        btnSair.setFont(new Font("High Tower Text", Font.PLAIN, 13));
+        btnSair.setBounds(125, 375, 75, 25);
+        btnSair.addActionListener(e -> {
+            new TelaPrincipal().setVisible(true);
+            dispose();
+        });
+        contentPane.add(btnSair);
+
+        JLabel lblImagem = new JLabel();
+        lblImagem.setIcon(new ImageIcon(Emprestimo.class.getResource("/imagens/icons8-ei-gatinha-100.png")));
+        lblImagem.setBounds(112, 0, 106, 81);
+        contentPane.add(lblImagem);
+    }
+
+    //metódo para o controller
+    public String getTxtCodigoLivro()      { return txtCodigoLivro.getText(); }
+    public String getTxtMatriculaUsuario() { return txtMatriculaUsuario.getText(); }
+
+    public void setTxtDataDevolucao(String data) {
+        txtDataDevolucao.setText(data);
+        btnSair.setVisible(true);
+    }
+
+    public void limparCampos() {
+        txtCodigoLivro.setText("");
+        txtMatriculaUsuario.setText("");
+        txtDataDevolucao.setText("");
+        btnSair.setVisible(false);
+    }
+
+    public void acaoBotaoConfirmar(ActionListener al) {
+        btnConfirmar.addActionListener(al);
+    }
 }
