@@ -43,7 +43,7 @@ public class BibliotecaDAO {
 		try(BufferedReader br = new BufferedReader(new FileReader(ARQUIVO_LIVROS))){
 			String linha;
 			while((linha = br.readLine()) != null) {
-				String[] dados = linha.split("|");
+				String[] dados = linha.split("\\|");
 				
 				int codigo = Integer.parseInt(dados[0]);
 				String titulo = dados[1];
@@ -95,7 +95,7 @@ public class BibliotecaDAO {
 		try (BufferedReader br = new BufferedReader(new FileReader(ARQUIVO_USUARIOS))){
 			String linha;
 			while((linha = br.readLine()) != null) {
-				String[] dados = linha.split("|");
+				String[] dados = linha.split("\\|");
 				
 				String nome = dados[0];
 				int matricula 	= Integer.parseInt(dados[1]);
