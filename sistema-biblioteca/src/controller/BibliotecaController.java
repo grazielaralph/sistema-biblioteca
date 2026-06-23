@@ -6,27 +6,24 @@ import model.Usuario;
 import view.CadastroLivro;
 
 import javax.swing.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BibliotecaController {
 
-    // lista em memória para armazenar os livros e usuários
     private List<Livro> livros = new ArrayList<>();
     private List<Usuario> usuarios = new ArrayList<>();
 
-    // matriz de emprestimo
-    private int[][] emprestimos = new int[100][2];
-    private int totalEmprestimos = 0;
+    private int proximoCodigoLivro = 1;
 
-    // contador de IDs para novos livros
-    private int proximoIdLivro = 1;
-
-    // view
     private CadastroLivro telaCadastroLivro;
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     public BibliotecaController(CadastroLivro telaCadastroLivro) {
-        this.telaCadastroLivro = telaCadastroLivro; 
+        this.telaCadastroLivro = telaCadastroLivro;
         registrarListeners();
         carregarDados();
     }
@@ -49,12 +46,11 @@ public class BibliotecaController {
             return;
         }
 
-        // verifica titulo duplicado
         for (Livro l : livros) {
-            if (l.getTitulo().equalsIgnoreCase(titulo)) { 
+            if (l.getTitulo().equalsIgnoreCase(titulo)) {
                 JOptionPane.showMessageDialog(
                     telaCadastroLivro,
-                    "Já existe um livro com este título!", 
+                    "Já existe um livro com este título!",
                     "Duplicado",
                     JOptionPane.WARNING_MESSAGE
                 );
@@ -62,14 +58,15 @@ public class BibliotecaController {
             }
         }
 
-        Livro novoLivro = new Livro(titulo, autor, true, proximoIdLivro++);
+        //construtor
+        Livro novoLivro = new Livro(proximoCodigoLivro++, titulo, autor, true, null, null, null);
         livros.add(novoLivro);
 
         BibliotecaDAO.salvarLivros(livros);
 
         JOptionPane.showMessageDialog(
             telaCadastroLivro,
-            "Livro \"" + titulo + "\" cadastrado com sucesso!", 
+            "Livro \"" + titulo + "\" cadastrado com sucesso!",
             "Sucesso",
             JOptionPane.INFORMATION_MESSAGE
         );
@@ -78,7 +75,7 @@ public class BibliotecaController {
     public void cadastrarUsuario(String nome, int matricula) {
 
         if (nome == null || nome.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, 
+            JOptionPane.showMessageDialog(null,
                 "O nome do usuário é obrigatório!",
                 "Erro de validação", JOptionPane.WARNING_MESSAGE);
             return;
@@ -87,7 +84,7 @@ public class BibliotecaController {
         for (Usuario u : usuarios) {
             if (u.getMatricula() == matricula) {
                 JOptionPane.showMessageDialog(null,
-                    "Matrícula " + matricula + " já cadastrada!", 
+                    "Matrícula " + matricula + " já cadastrada!",
                     "Duplicado", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -103,8 +100,7 @@ public class BibliotecaController {
             "Sucesso", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // emprestimo de livros
-    public void realizarEmprestimo(int matriculaUsuario, int idLivro) {
+    public void realizarEmprestimo(int matriculaUsuario, int codigoLivro) {
 
         Usuario usuarioEncontrado = null;
         for (Usuario u : usuarios) {
@@ -116,7 +112,7 @@ public class BibliotecaController {
 
         Livro livroEncontrado = null;
         for (Livro l : livros) {
-            if (l.getId() == idLivro) {
+            if (l.getCodigo() == codigoLivro) {         
                 livroEncontrado = l;
                 break;
             }
@@ -125,56 +121,48 @@ public class BibliotecaController {
         if (usuarioEncontrado == null) {
             JOptionPane.showMessageDialog(null,
                 "Usuário com matrícula " + matriculaUsuario + " não encontrado!",
-                "Erro", JOptionPane.ERROR_MESSAGE 
-            );
+                "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (livroEncontrado == null) {
             JOptionPane.showMessageDialog(null,
-                "Livro com ID " + idLivro + " não encontrado!",
-                "Erro", JOptionPane.ERROR_MESSAGE
-            );
+                "Livro com código " + codigoLivro + " não encontrado!",
+                "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (!livroEncontrado.isDisponivel()) {
             JOptionPane.showMessageDialog(null,
                 "O livro \"" + livroEncontrado.getTitulo() + "\" não está disponível para empréstimo!",
-                "Indisponível", JOptionPane.WARNING_MESSAGE
-            );
+                "Indisponível", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (totalEmprestimos >= emprestimos.length) {
-            JOptionPane.showMessageDialog(null,
-                "Limite de empréstimos atingido!",
-                "Limite", JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-
-        emprestimos[totalEmprestimos][0] = matriculaUsuario;
-        emprestimos[totalEmprestimos][1] = idLivro;
-        totalEmprestimos++;
+        //dados de empréstimo dentro do objeto Livro
+        String hoje       = LocalDate.now().format(FORMATTER);
+        String devolucao  = LocalDate.now().plusDays(14).format(FORMATTER); 
 
         livroEncontrado.setDisponivel(false);
+        livroEncontrado.setUsuarioEmprestimo(usuarioEncontrado.getNome());
+        livroEncontrado.setDataEmprestimo(hoje);
+        livroEncontrado.setDataDevolucao(devolucao);
+
         BibliotecaDAO.salvarLivros(livros);
 
         JOptionPane.showMessageDialog(null,
             "Empréstimo realizado com sucesso!\n" +
-            "Usuário : " + usuarioEncontrado.getNome() + "\n" + 
-            "Livro   : " + livroEncontrado.getTitulo(), 
-            "Empréstimo registrado.", JOptionPane.INFORMATION_MESSAGE
-        );
+            "Usuário       : " + usuarioEncontrado.getNome() + "\n" +
+            "Livro         : " + livroEncontrado.getTitulo() + "\n" +
+            "Devolução até : " + devolucao,
+            "Empréstimo registrado.", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // devolução
-    public void realizarDevolucao(int idLivro) {
+    public void realizarDevolucao(int codigoLivro) {
 
         Livro livroEncontrado = null;
         for (Livro l : livros) {
-            if (l.getId() == idLivro) { 
+            if (l.getCodigo() == codigoLivro) {          
                 livroEncontrado = l;
                 break;
             }
@@ -182,90 +170,77 @@ public class BibliotecaController {
 
         if (livroEncontrado == null) {
             JOptionPane.showMessageDialog(null,
-                "Livro com ID " + idLivro + " não encontrado!",
-                "Erro", JOptionPane.ERROR_MESSAGE
-            );
+                "Livro com código " + codigoLivro + " não encontrado!",
+                "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (livroEncontrado.isDisponivel()) {
-            JOptionPane.showMessageDialog(null, 
+            JOptionPane.showMessageDialog(null,
                 "Este livro não está emprestado.",
-                "Aviso", JOptionPane.WARNING_MESSAGE
-            );
+                "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // remove da matriz deslocando os registros
-        for (int i = 0; i < totalEmprestimos; i++) {
-            if (emprestimos[i][1] == idLivro) {
-                for (int j = i; j < totalEmprestimos - 1; j++) {
-                    emprestimos[j][0] = emprestimos[j + 1][0];
-                    emprestimos[j][1] = emprestimos[j + 1][1];
-                }
-                emprestimos[totalEmprestimos - 1][0] = 0;
-                emprestimos[totalEmprestimos - 1][1] = 0;
-                totalEmprestimos--;
-                break;
-            }
-        }
+        String titulo = livroEncontrado.getTitulo();
 
+        // limpa os dados de empréstimo
         livroEncontrado.setDisponivel(true);
+        livroEncontrado.setUsuarioEmprestimo(null);
+        livroEncontrado.setDataEmprestimo(null);
+        livroEncontrado.setDataDevolucao(null);
+
         BibliotecaDAO.salvarLivros(livros);
 
         JOptionPane.showMessageDialog(null,
-            "Devolução do livro \"" + livroEncontrado.getTitulo() + "\" registrada com sucesso!",
+            "Devolução do livro \"" + titulo + "\" registrada com sucesso!",
             "Devolução Confirmada", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // relatórios
+    // relatório de livros 
     public String[][] gerarRelatorioLivros() {
-        String[][] dados = new String[livros.size()][4];
+        String[][] dados = new String[livros.size()][7];
         for (int i = 0; i < livros.size(); i++) {
             Livro l = livros.get(i);
-            dados[i][0] = String.valueOf(l.getId()); 
+            dados[i][0] = String.valueOf(l.getCodigo());   
             dados[i][1] = l.getTitulo();
             dados[i][2] = l.getAutor();
             dados[i][3] = l.isDisponivel() ? "Disponível" : "Emprestado";
+            dados[i][4] = l.getUsuarioEmprestimo() != null ? l.getUsuarioEmprestimo() : "-";
+            dados[i][5] = l.getDataEmprestimo()    != null ? l.getDataEmprestimo()    : "-";
+            dados[i][6] = l.getDataDevolucao()     != null ? l.getDataDevolucao()     : "-";
         }
         return dados;
     }
 
+    // relatório de empréstimos
     public String[][] gerarRelatorioEmprestimos() {
-        String[][] dados = new String[totalEmprestimos][3];
-        for (int i = 0; i < totalEmprestimos; i++) {
-            int mat     = emprestimos[i][0];
-            int idLivro = emprestimos[i][1];
-
-            String tituloLivro = "";
-            
-            for (Livro l : livros) {
-                if (l.getId() == idLivro) {
-                    tituloLivro = l.getTitulo();
-                    break;
-                }
+        List<String[]> linhas = new ArrayList<>();
+        for (Livro l : livros) {
+            if (!l.isDisponivel()) {
+                linhas.add(new String[]{
+                    l.getUsuarioEmprestimo(),
+                    String.valueOf(l.getCodigo()),
+                    l.getTitulo(),
+                    l.getDataEmprestimo(),
+                    l.getDataDevolucao()
+                });
             }
-
-            dados[i][0] = String.valueOf(mat);
-            dados[i][1] = String.valueOf(idLivro);
-            dados[i][2] = tituloLivro;
         }
-        return dados;
+        return linhas.toArray(new String[0][]);
     }
 
     private void carregarDados() {
         livros   = BibliotecaDAO.carregarLivros();
         usuarios = BibliotecaDAO.carregarUsuario();
 
-        // recalcula o próximo ID com base nos livros que já tem
         for (Livro l : livros) {
-            if (l.getId() >= proximoIdLivro) {
-                proximoIdLivro = l.getId() + 1;
+            if (l.getCodigo() >= proximoCodigoLivro) {    
+                proximoCodigoLivro = l.getCodigo() + 1;
             }
         }
     }
 
-    // getters -> pra view preencher combos/tabelas
     public List<Livro> getLivros() {
         return new ArrayList<>(livros);
     }
