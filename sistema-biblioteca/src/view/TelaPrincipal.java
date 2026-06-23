@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 public class TelaPrincipal extends JFrame {
 
     private static final long serialVersionUID = 1L;
+    public static TelaPrincipal instancia;
     private JPanel contentPane;
 
     // views injetadas pelo Main (já conectadas ao controller)
