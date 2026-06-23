@@ -15,10 +15,13 @@ public class BibliotecaDAO {
 	public static void salvarLivros(List<Livro> listaLivros) {
 		try(BufferedWriter bw = new BufferedWriter (new FileWriter(ARQUIVO_LIVROS))) {
 			for (Livro livro : listaLivros) {
-				String linha = livro.getId() + "|" 
-							+ livro.getTitulo() + "|" 
-							+ livro.getAutor() + "|" 
-							+ livro.isDisponivel();
+				String linha = livro.getCodigo() + "|" +
+                        livro.getTitulo() + "|" +
+                        livro.getAutor() + "|" +
+                        livro.isDisponivel() + "|" +
+                        livro.getUsuarioEmprestimo() + "|" +
+                        livro.getDataEmprestimo() + "|" +
+                        livro.getDataDevolucao();
 				bw.write(linha);
 				bw.newLine();
 			}
@@ -46,11 +49,14 @@ public class BibliotecaDAO {
 				String[] dados = linha.split("\\|");
 				
 				int codigo = Integer.parseInt(dados[0]);
-				String titulo = dados[1];
-				String autor = dados[2];
-				boolean disponivel = Boolean.parseBoolean(dados[3]);
+                String titulo = dados[1];
+                String autor = dados[2];
+                boolean disponivel = Boolean.parseBoolean(dados[3]);
+                String usuario = dados[4];
+                String dtEmprestimo = dados[5];
+                String dtDevolucao = dados[6];
 				
-				Livro livro = new Livro(titulo, autor, disponivel, codigo);
+                Livro livro = new Livro(codigo, titulo, autor, disponivel, usuario, dtEmprestimo, dtDevolucao);
 				listaLivros.add(livro);
 			}
 			
