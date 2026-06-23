@@ -4,6 +4,9 @@ import model.BibliotecaDAO;
 import model.Livro;
 import model.Usuario;
 import view.CadastroLivro;
+import view.CadastroUsuario;
+import view.Emprestimo;
+import view.Devolução;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -18,130 +21,163 @@ public class BibliotecaController {
 
     private int proximoCodigoLivro = 1;
 
-    private CadastroLivro telaCadastroLivro;
-
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public BibliotecaController(CadastroLivro telaCadastroLivro) {
-        this.telaCadastroLivro = telaCadastroLivro;
-        registrarListeners();
+    // views gerenciadas pelo controller
+    private CadastroLivro    telaCadastroLivro;
+    private CadastroUsuario  telaCadastroUsuario;
+    private Emprestimo       telaEmprestimo;
+    private Devolução        telaDevolucao;
+
+    public BibliotecaController(CadastroLivro    telaCadastroLivro,
+                                CadastroUsuario  telaCadastroUsuario,
+                                Emprestimo       telaEmprestimo,
+                                Devolução        telaDevolucao) {
+
+        this.telaCadastroLivro   = telaCadastroLivro;
+        this.telaCadastroUsuario = telaCadastroUsuario;
+        this.telaEmprestimo      = telaEmprestimo;
+        this.telaDevolucao       = telaDevolucao;
+
         carregarDados();
+        registrarListeners();
     }
 
+    // listeners
     private void registrarListeners() {
-        telaCadastroLivro.acaoBotaoSalvar(e -> cadastrarLivro());
+        telaCadastroLivro  .acaoBotaoSalvar   (e -> cadastrarLivro());
+        telaCadastroUsuario.acaoBotaoSalvar   (e -> cadastrarUsuario());
+        telaEmprestimo     .acaoBotaoConfirmar(e -> realizarEmprestimo());
+        telaDevolucao      .acaoBotaoConfirmar(e -> realizarDevolucao());
     }
 
+    //cadastro de livro
     private void cadastrarLivro() {
         String titulo = telaCadastroLivro.getTxtTitulo().trim();
         String autor  = telaCadastroLivro.getTxtAutor().trim();
 
         if (titulo.isEmpty() || autor.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                telaCadastroLivro,
+            JOptionPane.showMessageDialog(telaCadastroLivro,
                 "Preencha todos os campos obrigatórios.",
-                "Erro de validação",
-                JOptionPane.WARNING_MESSAGE
-            );
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         for (Livro l : livros) {
             if (l.getTitulo().equalsIgnoreCase(titulo)) {
-                JOptionPane.showMessageDialog(
-                    telaCadastroLivro,
+                JOptionPane.showMessageDialog(telaCadastroLivro,
                     "Já existe um livro com este título!",
-                    "Duplicado",
-                    JOptionPane.WARNING_MESSAGE
-                );
+                    "Duplicado", JOptionPane.WARNING_MESSAGE);
                 return;
             }
         }
 
-        //construtor
         Livro novoLivro = new Livro(proximoCodigoLivro++, titulo, autor, true, null, null, null);
         livros.add(novoLivro);
-
         BibliotecaDAO.salvarLivros(livros);
 
-        JOptionPane.showMessageDialog(
-            telaCadastroLivro,
+        JOptionPane.showMessageDialog(telaCadastroLivro,
             "Livro \"" + titulo + "\" cadastrado com sucesso!",
-            "Sucesso",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+            "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+        telaCadastroLivro.limparCampos();
     }
 
-    public void cadastrarUsuario(String nome, int matricula) {
+    //cadastro de usuário
+    private void cadastrarUsuario() {
+        String nomeRaw = telaCadastroUsuario.getTxtNome();
+        String matRaw  = telaCadastroUsuario.getTxtMatricula();
 
-        if (nome == null || nome.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null,
+        if (nomeRaw == null || nomeRaw.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(telaCadastroUsuario,
                 "O nome do usuário é obrigatório!",
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int matricula;
+        try {
+            matricula = Integer.parseInt(matRaw.trim());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(telaCadastroUsuario,
+                "Matrícula deve ser um número inteiro!",
                 "Erro de validação", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         for (Usuario u : usuarios) {
             if (u.getMatricula() == matricula) {
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(telaCadastroUsuario,
                     "Matrícula " + matricula + " já cadastrada!",
                     "Duplicado", JOptionPane.WARNING_MESSAGE);
                 return;
             }
         }
 
-        Usuario novoUsuario = new Usuario(nome.trim(), matricula);
-        usuarios.add(novoUsuario);
-
+        usuarios.add(new Usuario(nomeRaw.trim(), matricula));
         BibliotecaDAO.salvarUsuarios(usuarios);
 
-        JOptionPane.showMessageDialog(null,
-            "Usuário \"" + nome.trim() + "\" cadastrado com sucesso!",
+        JOptionPane.showMessageDialog(telaCadastroUsuario,
+            "Usuário \"" + nomeRaw.trim() + "\" cadastrado com sucesso!",
             "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+        telaCadastroUsuario.limparCampos();
     }
 
-    public void realizarEmprestimo(int matriculaUsuario, int codigoLivro) {
+    //emprestimo
+    private void realizarEmprestimo() {
+        String codigoRaw = telaEmprestimo.getTxtCodigoLivro().trim();
+        String matRaw    = telaEmprestimo.getTxtMatriculaUsuario().trim();
+
+        if (codigoRaw.isEmpty() || matRaw.isEmpty()) {
+            JOptionPane.showMessageDialog(telaEmprestimo,
+                "Preencha o código do livro e a matrícula do usuário.",
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int codigoLivro, matricula;
+        try {
+            codigoLivro = Integer.parseInt(codigoRaw);
+            matricula   = Integer.parseInt(matRaw);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(telaEmprestimo,
+                "Código e matrícula devem ser números inteiros!",
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         Usuario usuarioEncontrado = null;
         for (Usuario u : usuarios) {
-            if (u.getMatricula() == matriculaUsuario) {
-                usuarioEncontrado = u;
-                break;
-            }
+            if (u.getMatricula() == matricula) { usuarioEncontrado = u; break; }
         }
 
         Livro livroEncontrado = null;
         for (Livro l : livros) {
-            if (l.getCodigo() == codigoLivro) {         
-                livroEncontrado = l;
-                break;
-            }
+            if (l.getCodigo() == codigoLivro) { livroEncontrado = l; break; }
         }
 
         if (usuarioEncontrado == null) {
-            JOptionPane.showMessageDialog(null,
-                "Usuário com matrícula " + matriculaUsuario + " não encontrado!",
+            JOptionPane.showMessageDialog(telaEmprestimo,
+                "Usuário com matrícula " + matricula + " não encontrado!",
                 "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (livroEncontrado == null) {
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(telaEmprestimo,
                 "Livro com código " + codigoLivro + " não encontrado!",
                 "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (!livroEncontrado.isDisponivel()) {
-            JOptionPane.showMessageDialog(null,
-                "O livro \"" + livroEncontrado.getTitulo() + "\" não está disponível para empréstimo!",
+            JOptionPane.showMessageDialog(telaEmprestimo,
+                "O livro \"" + livroEncontrado.getTitulo() + "\" não está disponível!",
                 "Indisponível", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        //dados de empréstimo dentro do objeto Livro
-        String hoje       = LocalDate.now().format(FORMATTER);
-        String devolucao  = LocalDate.now().plusDays(14).format(FORMATTER); 
+        String hoje      = LocalDate.now().format(FORMATTER);
+        String devolucao = LocalDate.now().plusDays(15).format(FORMATTER);
 
         livroEncontrado.setDisponivel(false);
         livroEncontrado.setUsuarioEmprestimo(usuarioEncontrado.getNome());
@@ -150,41 +186,75 @@ public class BibliotecaController {
 
         BibliotecaDAO.salvarLivros(livros);
 
-        JOptionPane.showMessageDialog(null,
-            "Empréstimo realizado com sucesso!\n" +
+        //atualiza o campo de data na tela
+        telaEmprestimo.setTxtDataDevolucao(devolucao);
+
+        JOptionPane.showMessageDialog(telaEmprestimo,
+            "Empréstimo realizado!\n" +
             "Usuário       : " + usuarioEncontrado.getNome() + "\n" +
             "Livro         : " + livroEncontrado.getTitulo() + "\n" +
             "Devolução até : " + devolucao,
-            "Empréstimo registrado.", JOptionPane.INFORMATION_MESSAGE);
+            "Empréstimo registrado", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void realizarDevolucao(int codigoLivro) {
+    //devolução
+    private void realizarDevolucao() {
+        String codigoRaw = telaDevolucao.getTxtCodigoLivro().trim();
+
+        if (codigoRaw.isEmpty()) {
+            JOptionPane.showMessageDialog(telaDevolucao,
+                "Informe o código do livro a devolver.",
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int codigoLivro;
+        try {
+            codigoLivro = Integer.parseInt(codigoRaw);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(telaDevolucao,
+                "Código do livro deve ser um número inteiro!",
+                "Erro de validação", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         Livro livroEncontrado = null;
         for (Livro l : livros) {
-            if (l.getCodigo() == codigoLivro) {          
-                livroEncontrado = l;
-                break;
-            }
+            if (l.getCodigo() == codigoLivro) { livroEncontrado = l; break; }
         }
 
         if (livroEncontrado == null) {
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(telaDevolucao,
                 "Livro com código " + codigoLivro + " não encontrado!",
                 "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         if (livroEncontrado.isDisponivel()) {
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(telaDevolucao,
                 "Este livro não está emprestado.",
                 "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        // calcula atraso com a data real guardada no livro
+        String hoje        = LocalDate.now().format(FORMATTER);
+        String dtDevolucao = livroEncontrado.getDataDevolucao();
+        String statusAtraso;
+
+        try {
+            LocalDate prazo = LocalDate.parse(dtDevolucao, FORMATTER);
+            long dias = java.time.temporal.ChronoUnit.DAYS.between(prazo, LocalDate.now());
+            statusAtraso = dias > 0 ? dias + " dias de atraso" : "No prazo / Sem atraso";
+            telaDevolucao.setStatusAtraso(statusAtraso, dias > 0);
+        } catch (Exception ex) {
+            statusAtraso = "Data de devolução inválida";
+            telaDevolucao.setStatusAtraso(statusAtraso, false);
+        }
+
+        telaDevolucao.setTxtDataDevolucaoReal(hoje);
+
         String titulo = livroEncontrado.getTitulo();
 
-        // limpa os dados de empréstimo
         livroEncontrado.setDisponivel(true);
         livroEncontrado.setUsuarioEmprestimo(null);
         livroEncontrado.setDataEmprestimo(null);
@@ -192,17 +262,17 @@ public class BibliotecaController {
 
         BibliotecaDAO.salvarLivros(livros);
 
-        JOptionPane.showMessageDialog(null,
-            "Devolução do livro \"" + titulo + "\" registrada com sucesso!",
+        JOptionPane.showMessageDialog(telaDevolucao,
+            "Devolução do livro \"" + titulo + "\" registrada!\n" + statusAtraso,
             "Devolução Confirmada", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // relatório de livros 
+    //relatórios
     public String[][] gerarRelatorioLivros() {
         String[][] dados = new String[livros.size()][7];
         for (int i = 0; i < livros.size(); i++) {
             Livro l = livros.get(i);
-            dados[i][0] = String.valueOf(l.getCodigo());   
+            dados[i][0] = String.valueOf(l.getCodigo());
             dados[i][1] = l.getTitulo();
             dados[i][2] = l.getAutor();
             dados[i][3] = l.isDisponivel() ? "Disponível" : "Emprestado";
@@ -213,7 +283,6 @@ public class BibliotecaController {
         return dados;
     }
 
-    // relatório de empréstimos
     public String[][] gerarRelatorioEmprestimos() {
         List<String[]> linhas = new ArrayList<>();
         for (Livro l : livros) {
@@ -230,24 +299,18 @@ public class BibliotecaController {
         return linhas.toArray(new String[0][]);
     }
 
+    // carregar dados do arquivo
     private void carregarDados() {
         livros   = BibliotecaDAO.carregarLivros();
         usuarios = BibliotecaDAO.carregarUsuario();
 
         for (Livro l : livros) {
-            if (l.getCodigo() >= proximoCodigoLivro) {    
+            if (l.getCodigo() >= proximoCodigoLivro)
                 proximoCodigoLivro = l.getCodigo() + 1;
-            }
         }
     }
 
-    public List<Livro> getLivros() {
-        return new ArrayList<>(livros);
-    }
-
-    public List<Usuario> getUsuarios() {
-        return new ArrayList<>(usuarios);
-    }
+    public List<Livro>   getLivros()   { return new ArrayList<>(livros); }
+    public List<Usuario> getUsuarios() { return new ArrayList<>(usuarios); }
 }
-
    
