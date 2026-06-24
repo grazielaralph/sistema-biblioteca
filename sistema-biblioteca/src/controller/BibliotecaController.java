@@ -6,6 +6,7 @@ import model.Usuario;
 import view.CadastroLivro;
 import view.CadastroUsuario;
 import view.Emprestimo;
+import view.RelatorioLivros;
 import view.TelaPrincipal;
 import view.Devolução;
 
@@ -24,30 +25,31 @@ public class BibliotecaController {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // views gerenciadas pelo controller
     private CadastroLivro    telaCadastroLivro;
     private CadastroUsuario  telaCadastroUsuario;
     private Emprestimo       telaEmprestimo;
     private Devolução        telaDevolucao;
-    private TelaPrincipal telaPrincipal;
+    private TelaPrincipal    telaPrincipal;
+    private RelatorioLivros  telaRelatorio;
 
     public BibliotecaController(CadastroLivro    telaCadastroLivro,
                                 CadastroUsuario  telaCadastroUsuario,
                                 Emprestimo       telaEmprestimo,
                                 Devolução        telaDevolucao,
-                                TelaPrincipal telaPrincipal) {
+                                TelaPrincipal    telaPrincipal,
+                                RelatorioLivros  telaRelatorio) {
 
         this.telaCadastroLivro   = telaCadastroLivro;
         this.telaCadastroUsuario = telaCadastroUsuario;
         this.telaEmprestimo      = telaEmprestimo;
         this.telaDevolucao       = telaDevolucao;
-        this.telaPrincipal = telaPrincipal;
+        this.telaPrincipal       = telaPrincipal;
+        this.telaRelatorio       = telaRelatorio;
 
         carregarDados();
         registrarListeners();
     }
 
-    // listeners
     private void registrarListeners() {
         telaCadastroLivro  .acaoBotaoSalvar   (e -> cadastrarLivro());
         telaCadastroUsuario.acaoBotaoSalvar   (e -> cadastrarUsuario());
@@ -57,9 +59,10 @@ public class BibliotecaController {
         telaCadastroUsuario.acaoBotaoVoltar(e -> voltarParaPrincipal(telaCadastroUsuario));
         telaEmprestimo     .acaoBotaoVoltar(e -> voltarParaPrincipal(telaEmprestimo));
         telaDevolucao      .acaoBotaoVoltar(e -> voltarParaPrincipal(telaDevolucao));
+        telaRelatorio      .acaoBotaoVoltar  (e -> voltarParaPrincipal(telaRelatorio));
+        telaRelatorio      .acaoBotaoAtualizar(e -> abrirRelatorio());
     }
 
-    //cadastro de livro
     private void cadastrarLivro() {
         String titulo = telaCadastroLivro.getTxtTitulo().trim();
         String autor  = telaCadastroLivro.getTxtAutor().trim();
@@ -80,20 +83,18 @@ public class BibliotecaController {
             }
         }
 
-        int idGerado = proximoCodigoLivro++;                              // ← guarda o ID
+        int idGerado = proximoCodigoLivro++;
         Livro novoLivro = new Livro(idGerado, titulo, autor, true, null, null, null);
         livros.add(novoLivro);
         BibliotecaDAO.salvarLivros(livros);
 
-        telaCadastroLivro.setTxtId(String.valueOf(idGerado));             // ← mostra o ID na tela
+        telaCadastroLivro.setTxtId(String.valueOf(idGerado));
 
         JOptionPane.showMessageDialog(telaCadastroLivro,
             "Livro \"" + titulo + "\" cadastrado com sucesso!\nID: " + idGerado,
             "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
     }
 
-    //cadastro de usuário
     private void cadastrarUsuario() {
         String nomeRaw = telaCadastroUsuario.getTxtNome();
         String matRaw  = telaCadastroUsuario.getTxtMatricula();
@@ -134,7 +135,6 @@ public class BibliotecaController {
         telaCadastroUsuario.limparCampos();
     }
 
-    //emprestimo
     private void realizarEmprestimo() {
         String codigoRaw = telaEmprestimo.getTxtCodigoLivro().trim();
         String matRaw    = telaEmprestimo.getTxtMatriculaUsuario().trim();
@@ -196,7 +196,6 @@ public class BibliotecaController {
 
         BibliotecaDAO.salvarLivros(livros);
 
-        //atualiza o campo de data na tela
         telaEmprestimo.setTxtDataDevolucao(devolucao);
 
         JOptionPane.showMessageDialog(telaEmprestimo,
@@ -207,7 +206,6 @@ public class BibliotecaController {
             "Empréstimo registrado", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    //devolução
     private void realizarDevolucao() {
         String codigoRaw = telaDevolucao.getTxtCodigoLivro().trim();
 
@@ -246,7 +244,6 @@ public class BibliotecaController {
             return;
         }
 
-        // calcula atraso com a data real guardada no livro
         String hoje        = LocalDate.now().format(FORMATTER);
         String dtDevolucao = livroEncontrado.getDataDevolucao();
         String statusAtraso;
@@ -277,14 +274,18 @@ public class BibliotecaController {
             "Devolução Confirmada", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    //voltar para tela principal
     private void voltarParaPrincipal(JFrame telaAtual) {
-        telaAtual.setVisible(false);   // esconde a tela atual (não destrói)
+        telaAtual.setVisible(false);
         telaPrincipal.setLocationRelativeTo(null);
         telaPrincipal.setVisible(true);
     }
-    
-    //relatórios
+
+    public void abrirRelatorio() {
+        telaRelatorio.preencherTabela(gerarRelatorioLivros());
+        telaRelatorio.setLocationRelativeTo(null);
+        telaRelatorio.setVisible(true);
+    }
+
     public String[][] gerarRelatorioLivros() {
         String[][] dados = new String[livros.size()][7];
         for (int i = 0; i < livros.size(); i++) {
@@ -292,12 +293,21 @@ public class BibliotecaController {
             dados[i][0] = String.valueOf(l.getCodigo());
             dados[i][1] = l.getTitulo();
             dados[i][2] = l.getAutor();
-            dados[i][3] = l.isDisponivel() ? "Disponível" : "Emprestado";
-            dados[i][4] = l.getUsuarioEmprestimo() != null ? l.getUsuarioEmprestimo() : "-";
-            dados[i][5] = l.getDataEmprestimo()    != null ? l.getDataEmprestimo()    : "-";
-            dados[i][6] = l.getDataDevolucao()     != null ? l.getDataDevolucao()     : "-";
+            // ← "Sim"/"Nao" para o renderer da tabela detectar corretamente
+            dados[i][3] = l.isDisponivel() ? "Sim" : "Nao";
+            dados[i][4] = vazio(l.getUsuarioEmprestimo());
+            dados[i][5] = vazio(l.getDataEmprestimo());
+            dados[i][6] = vazio(l.getDataDevolucao());
         }
         return dados;
+    }
+
+    /** Retorna "-" para qualquer valor nulo, vazio ou a string literal "null" */
+    private String vazio(String valor) {
+        if (valor == null) return "-";
+        String v = valor.trim();
+        if (v.isEmpty() || v.equalsIgnoreCase("null")) return "-";
+        return v;
     }
 
     public String[][] gerarRelatorioEmprestimos() {
@@ -305,18 +315,17 @@ public class BibliotecaController {
         for (Livro l : livros) {
             if (!l.isDisponivel()) {
                 linhas.add(new String[]{
-                    l.getUsuarioEmprestimo(),
+                    vazio(l.getUsuarioEmprestimo()),
                     String.valueOf(l.getCodigo()),
                     l.getTitulo(),
-                    l.getDataEmprestimo(),
-                    l.getDataDevolucao()
+                    vazio(l.getDataEmprestimo()),
+                    vazio(l.getDataDevolucao())
                 });
             }
         }
         return linhas.toArray(new String[0][]);
     }
 
-    // carregar dados do arquivo
     private void carregarDados() {
         livros   = BibliotecaDAO.carregarLivros();
         usuarios = BibliotecaDAO.carregarUsuario();
@@ -330,4 +339,3 @@ public class BibliotecaController {
     public List<Livro>   getLivros()   { return new ArrayList<>(livros); }
     public List<Usuario> getUsuarios() { return new ArrayList<>(usuarios); }
 }
-   

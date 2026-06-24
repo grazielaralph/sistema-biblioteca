@@ -5,6 +5,7 @@ import javax.swing.SwingUtilities;
 import view.CadastroLivro;
 import view.CadastroUsuario;
 import view.Emprestimo;
+import view.RelatorioLivros;
 import view.Devolução;
 import view.TelaPrincipal;
 
@@ -18,12 +19,12 @@ public class Main {
                 CadastroUsuario telaCadastroUsuario  = new CadastroUsuario();
                 Emprestimo      telaEmprestimo       = new Emprestimo();
                 Devolução       telaDevolucao        = new Devolução();
+                RelatorioLivros telaRelatorio = new RelatorioLivros();
                 
                 TelaPrincipal telaPrincipal = new TelaPrincipal(
-                	    telaCadastroUsuario,
-                	    telaCadastroLivro,
-                	    telaEmprestimo,
-                	    telaDevolucao
+                	    telaCadastroUsuario, telaCadastroLivro,
+                	    telaEmprestimo, telaDevolucao,
+                	    telaRelatorio  
                 	);
 
                 // 2. instancia o controller passando todas as views (listeners gerados em cada tela)
@@ -32,7 +33,8 @@ public class Main {
                 	    telaCadastroUsuario,
                 	    telaEmprestimo,
                 	    telaDevolucao,
-                	    telaPrincipal  
+                	    telaPrincipal,
+                	    telaRelatorio  
                 	);
 
                 

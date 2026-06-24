@@ -21,6 +21,7 @@ public class TelaPrincipal extends JFrame {
     private CadastroLivro   telaCadastroLivro;
     private Emprestimo      telaEmprestimo;
     private Devolução       telaDevolucao;
+    private RelatorioLivros telaRelatorio;
     
     //construtor padrao
     public TelaPrincipal() {}
@@ -28,12 +29,14 @@ public class TelaPrincipal extends JFrame {
     public TelaPrincipal(CadastroUsuario telaCadastroUsuario,
                          CadastroLivro   telaCadastroLivro,
                          Emprestimo      telaEmprestimo,
-                         Devolução       telaDevolucao) {
+                         Devolução       telaDevolucao,
+                         RelatorioLivros telaRelatorio) {
 
         this.telaCadastroUsuario = telaCadastroUsuario;
         this.telaCadastroLivro   = telaCadastroLivro;
         this.telaEmprestimo      = telaEmprestimo;
         this.telaDevolucao       = telaDevolucao;
+        this.telaRelatorio = telaRelatorio;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 358, 428);
@@ -62,6 +65,7 @@ public class TelaPrincipal extends JFrame {
         comboBox.addItem("Cadastro de Livro");
         comboBox.addItem("Empréstimo");
         comboBox.addItem("Devolução");
+        comboBox.addItem("Relatório");
         comboBox.setBounds(85, 168, 180, 25);
         contentPane.add(comboBox);
 
@@ -85,6 +89,7 @@ public class TelaPrincipal extends JFrame {
                 case "Cadastro de Livro"   -> tela = telaCadastroLivro;
                 case "Empréstimo"          -> tela = telaEmprestimo;
                 case "Devolução"           -> tela = telaDevolucao;
+                case "Relatório" -> tela = telaRelatorio;
             }
 
             if (tela != null) {
