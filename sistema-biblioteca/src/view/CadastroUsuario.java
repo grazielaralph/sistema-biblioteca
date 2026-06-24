@@ -33,6 +33,7 @@ public class CadastroUsuario extends JFrame {
     }
 
     public CadastroUsuario() {
+    	setTitle("Cadastro de Usuário");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 330, 418);
         contentPane = new JPanel();

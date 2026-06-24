@@ -35,6 +35,7 @@ public class Emprestimo extends JFrame {
     }
 
     public Emprestimo() {
+    	setTitle("Empréstimo de Livros");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 340, 470);
         contentPane = new JPanel();

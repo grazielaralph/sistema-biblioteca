@@ -34,6 +34,7 @@ public class CadastroLivro extends JFrame {
     }
 
     public CadastroLivro() {
+    	setTitle("Cadastro de Livro");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 368, 480);
         contentPane = new JPanel();

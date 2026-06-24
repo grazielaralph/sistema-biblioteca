@@ -38,6 +38,7 @@ public class TelaPrincipal extends JFrame {
         this.telaDevolucao       = telaDevolucao;
         this.telaRelatorio = telaRelatorio;
 
+        setTitle("Biblioteca da WePink");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 358, 428);
         contentPane = new JPanel();

@@ -35,6 +35,7 @@ public class Devolução extends JFrame {
     }
 
     public Devolução() {
+    	setTitle("Devolução de Livros");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 350, 480); // altura aumentada para caber o ícone
         contentPane = new JPanel();
